@@ -11,7 +11,7 @@ function loadGame(slug) {
                 if (listGame[j].slug == slug) {
                     var tmp_url = '';
                     if (listGame[j].domain == 1) {
-                        tmp_url = 'https://webglmath.github.io/' + slug + "/";
+                        tmp_url = '/images/logo/' + slug + "/";
                     } else if (listGame[j].domain == 2) {
                         tmp_url = 'https://ubg77.github.io/edit/' + slug + "/";
                     } else if (listGame[j].domain == 3) {
@@ -54,7 +54,7 @@ function showGame(slug) {
         if (listGame[j].slug == slug) {
             var tmp_url = '';
             if (listGame[j].domain == 1) {
-                tmp_url = 'https://webglmath.github.io/' + slug + "/";
+                tmp_url = '/images/logo/' + slug + "/";
             } else if (listGame[j].domain == 2) {
                 tmp_url = 'https://ubg77.github.io/edit/' + slug + "/";
             } else if (listGame[j].domain == 3) {
