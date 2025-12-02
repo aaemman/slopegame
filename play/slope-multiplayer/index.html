@@ -16,7 +16,7 @@
         body {
             background: #000;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
         #menu {
@@ -25,7 +25,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -38,111 +38,115 @@
         }
 
         .menu-title {
-            font-size: 72px;
+            font-size: 80px;
             font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88;
-            margin-bottom: 10px;
-            letter-spacing: 8px;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 40px #00ff00;
+            margin-bottom: 5px;
+            letter-spacing: 15px;
         }
 
         .menu-subtitle {
-            font-size: 24px;
-            color: #00ff88;
-            margin-bottom: 50px;
-            letter-spacing: 4px;
+            font-size: 28px;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            margin-bottom: 60px;
+            letter-spacing: 8px;
         }
 
         .menu-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            background: transparent;
             padding: 40px;
-            margin: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            min-width: 350px;
+            min-width: 400px;
         }
 
         .menu-section h2 {
-            color: #fff;
+            color: #00ff00;
             margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 22px;
+            text-shadow: 0 0 10px #00ff00;
+            letter-spacing: 3px;
         }
 
         .menu-input {
             width: 100%;
-            padding: 15px 20px;
-            font-size: 24px;
+            padding: 18px 25px;
+            font-size: 28px;
             text-align: center;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            letter-spacing: 8px;
+            border: 3px solid #00ff00;
+            border-radius: 0;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            letter-spacing: 12px;
             text-transform: uppercase;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
         }
 
         .menu-input::placeholder {
-            letter-spacing: 2px;
+            color: rgba(0, 255, 0, 0.5);
+            letter-spacing: 4px;
             text-transform: none;
+        }
+
+        .menu-input:focus {
+            outline: none;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
         }
 
         .menu-btn {
             width: 100%;
-            padding: 18px 40px;
-            font-size: 20px;
+            padding: 20px 40px;
+            font-size: 22px;
             font-weight: bold;
-            border: none;
-            border-radius: 10px;
+            border: 3px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .btn-create {
-            background: linear-gradient(135deg, #00ff88, #00cc6a);
-            color: #000;
-        }
-
-        .btn-join {
-            background: linear-gradient(135deg, #0088ff, #0066cc);
-            color: #fff;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
         }
 
         .menu-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
         }
 
         .room-code-display {
-            font-size: 36px;
-            color: #00ff88;
-            letter-spacing: 10px;
+            font-size: 48px;
+            color: #00ff00;
+            letter-spacing: 15px;
             font-weight: bold;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            margin: 20px 0;
+            padding: 25px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 3px solid #00ff00;
+            margin: 25px 0;
+            text-shadow: 0 0 20px #00ff00;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
         }
 
         .waiting-text {
-            color: #fff;
+            color: #00ff00;
             font-size: 18px;
             animation: pulse 1.5s infinite;
+            text-shadow: 0 0 10px #00ff00;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.4; }
         }
 
         .divider {
-            color: rgba(255, 255, 255, 0.5);
-            margin: 30px 0;
+            color: #00ff00;
+            margin: 35px 0;
             font-size: 18px;
+            opacity: 0.6;
         }
 
         #game-container {
@@ -168,34 +172,34 @@
 
         .player-label {
             position: absolute;
-            top: 20px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 28px;
+            font-size: 20px;
             font-weight: bold;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
             z-index: 100;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px currentColor;
         }
 
         #player1-view .player-label {
-            color: #4488ff;
+            color: #00aaff;
         }
 
         #player2-view .player-label {
-            color: #ff4444;
+            color: #ff3333;
         }
 
         .score-display {
             position: absolute;
-            top: 60px;
+            top: 50px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 48px;
+            font-size: 64px;
             font-weight: bold;
             color: #fff;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
             z-index: 100;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
         .opponent-score {
@@ -203,10 +207,20 @@
             top: 120px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
             z-index: 100;
+        }
+
+        .speed-display {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            color: #00ff00;
+            z-index: 100;
+            text-shadow: 0 0 10px #00ff00;
         }
 
         .game-over-overlay {
@@ -215,7 +229,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.85);
             display: none;
             justify-content: center;
             align-items: center;
@@ -228,16 +242,18 @@
         }
 
         .game-over-text {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: bold;
-            color: #ff4444;
-            text-shadow: 0 0 20px #ff4444;
+            color: #ff0000;
+            text-shadow: 0 0 30px #ff0000;
             margin-bottom: 20px;
+            letter-spacing: 8px;
         }
 
         .final-score {
-            font-size: 32px;
+            font-size: 36px;
             color: #fff;
+            text-shadow: 0 0 10px #fff;
         }
 
         .center-divider {
@@ -247,9 +263,9 @@
             transform: translateX(-50%);
             width: 4px;
             height: 100%;
-            background: linear-gradient(to bottom, #00ff88, #0088ff, #00ff88);
+            background: #00ff00;
             z-index: 150;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00;
         }
 
         .countdown-overlay {
@@ -258,7 +274,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             display: none;
             justify-content: center;
             align-items: center;
@@ -272,39 +288,41 @@
         .countdown-number {
             font-size: 200px;
             font-weight: bold;
-            color: #00ff88;
-            text-shadow: 0 0 50px #00ff88;
+            color: #00ff00;
+            text-shadow: 0 0 50px #00ff00, 0 0 100px #00ff00;
             animation: countdownPulse 1s ease-out;
         }
 
         @keyframes countdownPulse {
             0% { transform: scale(1.5); opacity: 0; }
             50% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(0.9); opacity: 0.8; }
         }
 
         .controls-hint {
             position: fixed;
-            bottom: 20px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(0, 255, 0, 0.5);
             font-size: 14px;
             z-index: 100;
+            letter-spacing: 2px;
         }
 
         .status-message {
-            color: #ffaa00;
+            color: #ff6600;
             font-size: 16px;
-            margin-top: 15px;
+            margin-top: 20px;
             min-height: 24px;
+            text-shadow: 0 0 10px #ff6600;
         }
 
         .instructions {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(0, 255, 0, 0.5);
             font-size: 14px;
-            margin-top: 20px;
-            line-height: 1.6;
+            margin-top: 30px;
+            line-height: 1.8;
         }
     </style>
 </head>
@@ -314,36 +332,37 @@
         <div class="menu-subtitle">MULTIPLAYER</div>
 
         <div class="menu-section" id="main-menu">
-            <h2>Create a Room</h2>
-            <button class="menu-btn btn-create" id="create-btn">Create Room</button>
+            <h2>CREATE A ROOM</h2>
+            <button class="menu-btn" id="create-btn">CREATE ROOM</button>
 
-            <div class="divider">- OR -</div>
+            <div class="divider">— OR —</div>
 
-            <h2>Join a Room</h2>
-            <input type="text" class="menu-input" id="room-input" placeholder="Enter Code" maxlength="6">
-            <button class="menu-btn btn-join" id="join-btn">Join Room</button>
+            <h2>JOIN A ROOM</h2>
+            <input type="text" class="menu-input" id="room-input" placeholder="ROOM CODE" maxlength="6">
+            <button class="menu-btn" id="join-btn">JOIN ROOM</button>
 
             <div class="status-message" id="status-message"></div>
 
             <div class="instructions">
-                Use LEFT/RIGHT arrow keys or A/D to steer<br>
-                Avoid obstacles and don't fall off the edge!
+                USE LEFT/RIGHT ARROWS OR A/D TO STEER<br>
+                AVOID RED OBSTACLES • DON'T FALL OFF
             </div>
         </div>
 
         <div class="menu-section hidden" id="waiting-room">
-            <h2>Your Room Code</h2>
+            <h2>YOUR ROOM CODE</h2>
             <div class="room-code-display" id="room-code-display">------</div>
-            <div class="waiting-text">Waiting for opponent to join...</div>
+            <div class="waiting-text">WAITING FOR OPPONENT...</div>
             <div class="status-message" id="waiting-status"></div>
         </div>
     </div>
 
     <div id="game-container">
         <div class="player-view" id="player1-view">
-            <div class="player-label">PLAYER 1 (BLUE)</div>
+            <div class="player-label">PLAYER 1</div>
             <div class="score-display" id="score1">0</div>
             <div class="opponent-score" id="opponent-score1">Opponent: 0</div>
+            <div class="speed-display" id="speed1">SPEED: 0</div>
             <div class="game-over-overlay" id="gameover1">
                 <div class="game-over-text">GAME OVER</div>
                 <div class="final-score" id="final-score1">Score: 0</div>
@@ -351,9 +370,10 @@
         </div>
         <div class="center-divider"></div>
         <div class="player-view" id="player2-view">
-            <div class="player-label">PLAYER 2 (RED)</div>
+            <div class="player-label">PLAYER 2</div>
             <div class="score-display" id="score2">0</div>
             <div class="opponent-score" id="opponent-score2">Opponent: 0</div>
+            <div class="speed-display" id="speed2">SPEED: 0</div>
             <div class="game-over-overlay" id="gameover2">
                 <div class="game-over-text">GAME OVER</div>
                 <div class="final-score" id="final-score2">Score: 0</div>
@@ -366,7 +386,7 @@
     </div>
 
     <div class="controls-hint" id="controls-hint" style="display: none;">
-        Use LEFT/RIGHT arrows or A/D to steer
+        ← → OR A/D TO STEER
     </div>
 
     <script>
@@ -393,39 +413,49 @@
         let roomCode = '';
         let gameSeed = 0;
         let gameStarted = false;
-        let localPlayerIndex = 0; // 0 for host (blue), 1 for guest (red)
+        let localPlayerIndex = 0;
 
         // Game objects
         let scenes = [null, null];
         let cameras = [null, null];
         let renderers = [null, null];
         let balls = [null, null];
+        let ballGlows = [null, null];
         let terrainChunks = [[], []];
         let obstacles = [[], []];
+        let tunnelPieces = [[], []];
 
         // Physics
         let velocities = [
-            new THREE.Vector3(0, 0, -15),
-            new THREE.Vector3(0, 0, -15)
+            new THREE.Vector3(0, 0, -20),
+            new THREE.Vector3(0, 0, -20)
         ];
         let positions = [
-            new THREE.Vector3(0, 5, 0),
-            new THREE.Vector3(0, 5, 0)
+            new THREE.Vector3(0, 2, 0),
+            new THREE.Vector3(0, 2, 0)
         ];
         let scores = [0, 0];
         let gameOvers = [false, false];
+        let currentSpeed = [20, 20];
 
         // Controls
         let keys = { left: false, right: false };
 
         // Constants
-        const GRAVITY = -30;
-        const MOVE_SPEED = 25;
-        const FORWARD_SPEED = 25;
-        const FORWARD_ACCELERATION = 0.5;
-        const CHUNK_LENGTH = 100;
-        const TRACK_WIDTH = 12;
+        const GRAVITY = -50;
+        const MOVE_SPEED = 20;
+        const INITIAL_SPEED = 20;
+        const MAX_SPEED = 80;
+        const ACCELERATION = 0.8;
+        const CHUNK_LENGTH = 80;
+        const TRACK_WIDTH = 10;
         const BALL_RADIUS = 0.5;
+
+        // Colors - Classic Slope palette
+        const NEON_GREEN = 0x00ff00;
+        const DARK_GREEN = 0x003300;
+        const RED = 0xff0000;
+        const BLUE = 0x00aaff;
 
         // ==================== MENU FUNCTIONS ====================
         function generateRoomCode() {
@@ -443,8 +473,7 @@
 
         function initPeer(id = null) {
             return new Promise((resolve, reject) => {
-                const config = id ? { debug: 0 } : { debug: 0 };
-                peer = id ? new Peer(id, config) : new Peer(config);
+                peer = id ? new Peer(id, { debug: 0 }) : new Peer({ debug: 0 });
 
                 peer.on('open', (peerId) => {
                     console.log('Peer ID:', peerId);
@@ -532,7 +561,6 @@
             });
 
             if (isHost) {
-                // Host generates the seed and sends to guest
                 gameSeed = Math.floor(Math.random() * 1000000);
                 setTimeout(() => {
                     conn.send({ type: 'init', seed: gameSeed });
@@ -549,10 +577,12 @@
                     break;
 
                 case 'position':
-                    // Update opponent's position
                     const oppIndex = 1 - localPlayerIndex;
                     if (balls[oppIndex]) {
                         balls[oppIndex].position.set(data.x, data.y, data.z);
+                        if (ballGlows[oppIndex]) {
+                            ballGlows[oppIndex].position.copy(balls[oppIndex].position);
+                        }
                     }
                     break;
 
@@ -616,13 +646,12 @@
                 if (count > 0) {
                     countdownEl.textContent = count;
                     countdownEl.style.animation = 'none';
-                    countdownEl.offsetHeight; // Trigger reflow
+                    countdownEl.offsetHeight;
                     countdownEl.style.animation = 'countdownPulse 1s ease-out';
                     count--;
                     setTimeout(tick, 1000);
                 } else {
                     countdownEl.textContent = 'GO!';
-                    countdownEl.style.color = '#00ff88';
                     setTimeout(() => {
                         document.getElementById('countdown-overlay').classList.remove('active');
                         gameStarted = true;
@@ -639,180 +668,237 @@
             const container1 = document.getElementById('player1-view');
             const container2 = document.getElementById('player2-view');
 
-            // Initialize both player views
             initPlayerView(0, container1);
             initPlayerView(1, container2);
 
-            // Generate initial terrain for both
             const rng1 = new SeededRandom(gameSeed);
             const rng2 = new SeededRandom(gameSeed);
 
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 6; i++) {
                 generateTerrainChunk(0, i, rng1);
                 generateTerrainChunk(1, i, rng2);
             }
         }
 
         function initPlayerView(index, container) {
-            // Scene
+            // Scene - Pure black background
             scenes[index] = new THREE.Scene();
-            scenes[index].background = new THREE.Color(index === 0 ? 0x0a0a1a : 0x1a0a0a);
-            scenes[index].fog = new THREE.Fog(scenes[index].background, 30, 150);
+            scenes[index].background = new THREE.Color(0x000000);
+            scenes[index].fog = new THREE.FogExp2(0x000000, 0.008);
 
-            // Camera
-            cameras[index] = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            cameras[index].position.set(0, 8, 12);
-            cameras[index].lookAt(0, 0, -10);
+            // Camera - Classic Slope angle
+            cameras[index] = new THREE.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.1, 500);
+            cameras[index].position.set(0, 4, 8);
+            cameras[index].lookAt(0, 0, -20);
 
             // Renderer
             renderers[index] = new THREE.WebGLRenderer({ antialias: true });
             renderers[index].setSize(container.clientWidth, container.clientHeight);
-            renderers[index].shadowMap.enabled = true;
+            renderers[index].setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderers[index].domElement);
 
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            // Lighting - Minimal, focused on glow effects
+            const ambientLight = new THREE.AmbientLight(0x111111);
             scenes[index].add(ambientLight);
 
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(10, 20, 10);
-            directionalLight.castShadow = true;
-            scenes[index].add(directionalLight);
+            // Subtle directional light
+            const dirLight = new THREE.DirectionalLight(0x00ff00, 0.3);
+            dirLight.position.set(0, 10, 5);
+            scenes[index].add(dirLight);
 
-            // Ball
+            // Ball - Player color with glow
+            const ballColor = index === 0 ? BLUE : RED;
             const ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 32, 32);
-            const ballColor = index === 0 ? 0x4488ff : 0xff4444;
-            const ballMaterial = new THREE.MeshPhongMaterial({
-                color: ballColor,
-                emissive: ballColor,
-                emissiveIntensity: 0.3,
-                shininess: 100
+            const ballMaterial = new THREE.MeshBasicMaterial({
+                color: ballColor
             });
             balls[index] = new THREE.Mesh(ballGeometry, ballMaterial);
             balls[index].position.copy(positions[index]);
-            balls[index].castShadow = true;
             scenes[index].add(balls[index]);
 
-            // Add glow effect
-            const glowGeometry = new THREE.SphereGeometry(BALL_RADIUS * 1.2, 32, 32);
+            // Ball glow effect
+            const glowGeometry = new THREE.SphereGeometry(BALL_RADIUS * 1.5, 32, 32);
             const glowMaterial = new THREE.MeshBasicMaterial({
                 color: ballColor,
                 transparent: true,
                 opacity: 0.3
             });
-            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-            balls[index].add(glow);
+            ballGlows[index] = new THREE.Mesh(glowGeometry, glowMaterial);
+            ballGlows[index].position.copy(positions[index]);
+            scenes[index].add(ballGlows[index]);
+
+            // Add starfield background
+            createStarfield(index);
+        }
+
+        function createStarfield(index) {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starCount = 2000;
+            const positions = new Float32Array(starCount * 3);
+
+            for (let i = 0; i < starCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 500;
+                positions[i + 1] = (Math.random() - 0.5) * 300;
+                positions[i + 2] = -Math.random() * 500;
+            }
+
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const starsMaterial = new THREE.PointsMaterial({
+                color: 0x00ff00,
+                size: 0.5,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            const stars = new THREE.Points(starsGeometry, starsMaterial);
+            scenes[index].add(stars);
         }
 
         function generateTerrainChunk(playerIndex, chunkIndex, rng) {
             const scene = scenes[playerIndex];
             const startZ = -chunkIndex * CHUNK_LENGTH;
 
-            // Track segments
-            const segmentLength = 10;
+            const segmentLength = 8;
             const numSegments = CHUNK_LENGTH / segmentLength;
+
+            let prevHeight = chunkIndex === 0 ? 0 : rng.range(-1, 1);
 
             for (let i = 0; i < numSegments; i++) {
                 const z = startZ - i * segmentLength;
 
-                // Random slope variations
-                const slopeAngle = rng.range(-0.1, 0.1);
-                const bankAngle = rng.range(-0.15, 0.15);
-                const heightOffset = rng.range(-0.5, 0.5);
+                // Smooth height variations
+                const targetHeight = prevHeight + rng.range(-0.8, 0.8);
+                const height = prevHeight + (targetHeight - prevHeight) * 0.3;
+                prevHeight = height;
 
-                // Create track segment
-                const trackGeometry = new THREE.BoxGeometry(TRACK_WIDTH, 0.5, segmentLength + 0.1);
-                const trackMaterial = new THREE.MeshPhongMaterial({
-                    color: 0x333344,
-                    shininess: 30
+                // Track slope and banking
+                const slopeAngle = rng.range(-0.08, 0.08);
+                const bankAngle = rng.range(-0.12, 0.12);
+
+                // Main track surface - dark with green edges
+                const trackGeometry = new THREE.BoxGeometry(TRACK_WIDTH, 0.3, segmentLength + 0.5);
+                const trackMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x1a1a1a
                 });
                 const track = new THREE.Mesh(trackGeometry, trackMaterial);
-                track.position.set(0, heightOffset, z - segmentLength / 2);
+                track.position.set(0, height, z - segmentLength / 2);
                 track.rotation.x = slopeAngle;
                 track.rotation.z = bankAngle;
-                track.receiveShadow = true;
                 scene.add(track);
                 terrainChunks[playerIndex].push(track);
 
-                // Side walls
-                const wallGeometry = new THREE.BoxGeometry(0.5, 2, segmentLength + 0.1);
-                const wallMaterial = new THREE.MeshPhongMaterial({
-                    color: 0x00ff88,
-                    emissive: 0x00ff88,
-                    emissiveIntensity: 0.2
+                // Neon green edge lines (left)
+                const leftEdgeGeometry = new THREE.BoxGeometry(0.15, 0.4, segmentLength + 0.5);
+                const edgeMaterial = new THREE.MeshBasicMaterial({
+                    color: NEON_GREEN
                 });
+                const leftEdge = new THREE.Mesh(leftEdgeGeometry, edgeMaterial);
+                leftEdge.position.set(-TRACK_WIDTH / 2 + 0.1, height + 0.2, z - segmentLength / 2);
+                leftEdge.rotation.x = slopeAngle;
+                leftEdge.rotation.z = bankAngle;
+                scene.add(leftEdge);
+                terrainChunks[playerIndex].push(leftEdge);
 
-                const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
-                leftWall.position.set(-TRACK_WIDTH / 2 - 0.25, heightOffset + 1, z - segmentLength / 2);
-                leftWall.rotation.x = slopeAngle;
-                scene.add(leftWall);
-                terrainChunks[playerIndex].push(leftWall);
+                // Neon green edge lines (right)
+                const rightEdge = new THREE.Mesh(leftEdgeGeometry, edgeMaterial);
+                rightEdge.position.set(TRACK_WIDTH / 2 - 0.1, height + 0.2, z - segmentLength / 2);
+                rightEdge.rotation.x = slopeAngle;
+                rightEdge.rotation.z = bankAngle;
+                scene.add(rightEdge);
+                terrainChunks[playerIndex].push(rightEdge);
 
-                const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
-                rightWall.position.set(TRACK_WIDTH / 2 + 0.25, heightOffset + 1, z - segmentLength / 2);
-                rightWall.rotation.x = slopeAngle;
-                scene.add(rightWall);
-                terrainChunks[playerIndex].push(rightWall);
+                // Grid lines on track
+                if (i % 2 === 0) {
+                    const gridGeometry = new THREE.BoxGeometry(TRACK_WIDTH - 0.4, 0.02, 0.1);
+                    const gridMaterial = new THREE.MeshBasicMaterial({
+                        color: 0x003300,
+                        transparent: true,
+                        opacity: 0.5
+                    });
+                    const gridLine = new THREE.Mesh(gridGeometry, gridMaterial);
+                    gridLine.position.set(0, height + 0.16, z - segmentLength / 2);
+                    gridLine.rotation.x = slopeAngle;
+                    gridLine.rotation.z = bankAngle;
+                    scene.add(gridLine);
+                    terrainChunks[playerIndex].push(gridLine);
+                }
 
-                // Random obstacles
-                if (rng.next() < 0.3 && chunkIndex > 0) {
-                    const obstacleType = Math.floor(rng.next() * 3);
-                    let obstacle;
+                // Red obstacles
+                if (rng.next() < 0.25 && chunkIndex > 0) {
+                    const obsType = rng.next();
 
-                    if (obstacleType === 0) {
-                        // Red block
-                        const obsGeometry = new THREE.BoxGeometry(2, 2, 2);
-                        const obsMaterial = new THREE.MeshPhongMaterial({
-                            color: 0xff0000,
-                            emissive: 0xff0000,
-                            emissiveIntensity: 0.3
+                    if (obsType < 0.7) {
+                        // Classic red block
+                        const obsSize = rng.range(1.5, 2.5);
+                        const obsGeometry = new THREE.BoxGeometry(obsSize, obsSize, obsSize);
+                        const obsMaterial = new THREE.MeshBasicMaterial({
+                            color: RED
                         });
-                        obstacle = new THREE.Mesh(obsGeometry, obsMaterial);
-                    } else if (obstacleType === 1) {
-                        // Cylinder
-                        const obsGeometry = new THREE.CylinderGeometry(1, 1, 2, 16);
-                        const obsMaterial = new THREE.MeshPhongMaterial({
-                            color: 0xff4400,
-                            emissive: 0xff4400,
-                            emissiveIntensity: 0.3
+                        const obstacle = new THREE.Mesh(obsGeometry, obsMaterial);
+
+                        const xPos = rng.range(-TRACK_WIDTH / 2 + 2, TRACK_WIDTH / 2 - 2);
+                        obstacle.position.set(xPos, height + obsSize / 2 + 0.15, z - segmentLength / 2);
+                        scene.add(obstacle);
+                        obstacles[playerIndex].push(obstacle);
+
+                        // Red glow
+                        const glowGeometry = new THREE.BoxGeometry(obsSize + 0.3, obsSize + 0.3, obsSize + 0.3);
+                        const glowMaterial = new THREE.MeshBasicMaterial({
+                            color: RED,
+                            transparent: true,
+                            opacity: 0.2
                         });
-                        obstacle = new THREE.Mesh(obsGeometry, obsMaterial);
+                        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                        glow.position.copy(obstacle.position);
+                        scene.add(glow);
+                        terrainChunks[playerIndex].push(glow);
                     } else {
-                        // Ramp
-                        const obsGeometry = new THREE.BoxGeometry(3, 0.5, 4);
-                        const obsMaterial = new THREE.MeshPhongMaterial({
-                            color: 0xffff00,
-                            emissive: 0xffff00,
-                            emissiveIntensity: 0.2
-                        });
-                        obstacle = new THREE.Mesh(obsGeometry, obsMaterial);
-                        obstacle.rotation.x = -0.3;
-                    }
+                        // Tunnel section (gap in track)
+                        if (rng.next() < 0.3) {
+                            // Create narrow passage
+                            const gapWidth = rng.range(3, 5);
+                            const gapPos = rng.range(-2, 2);
 
-                    const xPos = rng.range(-TRACK_WIDTH / 2 + 2, TRACK_WIDTH / 2 - 2);
-                    obstacle.position.set(xPos, heightOffset + 1.5, z - segmentLength / 2);
-                    obstacle.castShadow = true;
-                    scene.add(obstacle);
-                    obstacles[playerIndex].push(obstacle);
+                            const leftBlockGeom = new THREE.BoxGeometry(
+                                (TRACK_WIDTH / 2 - gapWidth / 2 + gapPos),
+                                2,
+                                segmentLength
+                            );
+                            const blockMat = new THREE.MeshBasicMaterial({ color: RED });
+
+                            if (TRACK_WIDTH / 2 - gapWidth / 2 + gapPos > 0.5) {
+                                const leftBlock = new THREE.Mesh(leftBlockGeom, blockMat);
+                                leftBlock.position.set(
+                                    -TRACK_WIDTH / 2 + (TRACK_WIDTH / 2 - gapWidth / 2 + gapPos) / 2,
+                                    height + 1.15,
+                                    z - segmentLength / 2
+                                );
+                                scene.add(leftBlock);
+                                obstacles[playerIndex].push(leftBlock);
+                            }
+
+                            const rightBlockWidth = TRACK_WIDTH / 2 - gapWidth / 2 - gapPos;
+                            if (rightBlockWidth > 0.5) {
+                                const rightBlockGeom = new THREE.BoxGeometry(rightBlockWidth, 2, segmentLength);
+                                const rightBlock = new THREE.Mesh(rightBlockGeom, blockMat);
+                                rightBlock.position.set(
+                                    TRACK_WIDTH / 2 - rightBlockWidth / 2,
+                                    height + 1.15,
+                                    z - segmentLength / 2
+                                );
+                                scene.add(rightBlock);
+                                obstacles[playerIndex].push(rightBlock);
+                            }
+                        }
+                    }
                 }
             }
-
-            // Ground plane (for visual depth)
-            const groundGeometry = new THREE.PlaneGeometry(200, CHUNK_LENGTH);
-            const groundMaterial = new THREE.MeshPhongMaterial({
-                color: 0x111122,
-                side: THREE.DoubleSide
-            });
-            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-            ground.rotation.x = Math.PI / 2;
-            ground.position.set(0, -20, startZ - CHUNK_LENGTH / 2);
-            scene.add(ground);
-            terrainChunks[playerIndex].push(ground);
         }
 
         // ==================== GAME LOOP ====================
         let lastTime = 0;
-        let lastChunkGenerated = [4, 4];
+        let lastChunkGenerated = [5, 5];
         let networkUpdateTimer = 0;
 
         function animate(currentTime = 0) {
@@ -820,31 +906,31 @@
 
             requestAnimationFrame(animate);
 
-            const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.1);
+            const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.05);
             lastTime = currentTime;
 
-            // Update local player
             if (!gameOvers[localPlayerIndex]) {
                 updatePlayer(localPlayerIndex, deltaTime);
             }
 
-            // Network updates
             networkUpdateTimer += deltaTime;
-            if (networkUpdateTimer > 0.05) { // 20 times per second
+            if (networkUpdateTimer > 0.033) {
                 sendPosition();
                 sendScore();
                 networkUpdateTimer = 0;
             }
 
-            // Update cameras and render
+            // Render both views
             for (let i = 0; i < 2; i++) {
                 if (scenes[i] && cameras[i] && renderers[i]) {
-                    // Camera follows ball
-                    const targetX = balls[i].position.x * 0.5;
-                    cameras[i].position.x += (targetX - cameras[i].position.x) * 0.1;
-                    cameras[i].position.z = balls[i].position.z + 12;
-                    cameras[i].position.y = balls[i].position.y + 8;
-                    cameras[i].lookAt(balls[i].position.x, balls[i].position.y, balls[i].position.z - 10);
+                    // Camera follows ball - classic Slope perspective
+                    const ballPos = balls[i].position;
+
+                    cameras[i].position.x += (ballPos.x * 0.3 - cameras[i].position.x) * 0.08;
+                    cameras[i].position.y += (ballPos.y + 4 - cameras[i].position.y) * 0.1;
+                    cameras[i].position.z = ballPos.z + 8;
+
+                    cameras[i].lookAt(ballPos.x * 0.5, ballPos.y, ballPos.z - 15);
 
                     renderers[i].render(scenes[i], cameras[i]);
                 }
@@ -855,17 +941,19 @@
             const pos = positions[index];
             const vel = velocities[index];
 
-            // Apply gravity
+            // Accelerate forward over time
+            currentSpeed[index] = Math.min(currentSpeed[index] + ACCELERATION * deltaTime, MAX_SPEED);
+            vel.z = -currentSpeed[index];
+
+            // Gravity
             vel.y += GRAVITY * deltaTime;
 
-            // Forward movement (accelerate over time)
-            vel.z = -Math.min(FORWARD_SPEED + scores[index] * FORWARD_ACCELERATION / 100, 60);
-
-            // Left/right control (only for local player)
+            // Controls
             if (index === localPlayerIndex) {
-                if (keys.left) vel.x = -MOVE_SPEED;
-                else if (keys.right) vel.x = MOVE_SPEED;
-                else vel.x *= 0.9;
+                const turnSpeed = MOVE_SPEED * (1 + currentSpeed[index] / 100);
+                if (keys.left) vel.x = -turnSpeed;
+                else if (keys.right) vel.x = turnSpeed;
+                else vel.x *= 0.92;
             }
 
             // Update position
@@ -873,73 +961,90 @@
             pos.y += vel.y * deltaTime;
             pos.z += vel.z * deltaTime;
 
-            // Simple ground collision (approximate)
-            if (pos.y < BALL_RADIUS) {
-                pos.y = BALL_RADIUS;
+            // Ground collision (simple)
+            const groundY = getGroundHeight(index, pos.z);
+            if (pos.y < groundY + BALL_RADIUS) {
+                pos.y = groundY + BALL_RADIUS;
                 vel.y = 0;
             }
 
-            // Check boundaries
+            // Boundary check
             if (Math.abs(pos.x) > TRACK_WIDTH / 2 - BALL_RADIUS) {
-                pos.x = Math.sign(pos.x) * (TRACK_WIDTH / 2 - BALL_RADIUS);
-                vel.x = 0;
-            }
-
-            // Check if fallen off
-            if (pos.y < -10) {
+                // Fell off the edge
                 triggerGameOver(index);
                 return;
             }
 
-            // Check obstacle collisions
+            // Fell too far
+            if (pos.y < -15) {
+                triggerGameOver(index);
+                return;
+            }
+
+            // Obstacle collision
             for (const obstacle of obstacles[index]) {
-                if (obstacle.position.distanceTo(pos) < 2) {
+                const dx = Math.abs(pos.x - obstacle.position.x);
+                const dy = Math.abs(pos.y - obstacle.position.y);
+                const dz = Math.abs(pos.z - obstacle.position.z);
+
+                // Simple box collision
+                const obsSize = obstacle.geometry.parameters.width / 2 + BALL_RADIUS;
+                if (dx < obsSize && dy < obsSize && dz < obsSize) {
                     triggerGameOver(index);
                     return;
                 }
             }
 
-            // Update ball position
+            // Update ball visual
             balls[index].position.copy(pos);
+            balls[index].rotation.x -= vel.z * deltaTime * 2;
+            ballGlows[index].position.copy(pos);
 
-            // Update score
+            // Update score (distance traveled)
             scores[index] = Math.floor(-pos.z);
             updateScore(index);
 
+            // Update speed display
+            document.getElementById('speed' + (index + 1)).textContent =
+                'SPEED: ' + Math.floor(currentSpeed[index]);
+
             // Generate more terrain
             const currentChunk = Math.floor(-pos.z / CHUNK_LENGTH);
-            if (currentChunk > lastChunkGenerated[index] - 3) {
+            if (currentChunk > lastChunkGenerated[index] - 4) {
                 lastChunkGenerated[index]++;
                 const rng = new SeededRandom(gameSeed);
-                // Advance RNG to correct position
-                for (let i = 0; i < lastChunkGenerated[index] * 100; i++) rng.next();
+                for (let i = 0; i < lastChunkGenerated[index] * 50; i++) rng.next();
                 generateTerrainChunk(index, lastChunkGenerated[index], rng);
             }
 
-            // Cleanup old terrain
+            // Cleanup
             cleanupTerrain(index);
+        }
+
+        function getGroundHeight(index, z) {
+            // Simplified - return approximate ground level
+            // In a full implementation, you'd ray cast to find exact ground
+            return 0;
         }
 
         function cleanupTerrain(index) {
             const pos = positions[index];
 
-            // Remove terrain chunks that are far behind
             terrainChunks[index] = terrainChunks[index].filter(chunk => {
-                if (chunk.position.z > pos.z + 50) {
+                if (chunk.position.z > pos.z + 30) {
                     scenes[index].remove(chunk);
-                    chunk.geometry.dispose();
-                    chunk.material.dispose();
+                    if (chunk.geometry) chunk.geometry.dispose();
+                    if (chunk.material) chunk.material.dispose();
                     return false;
                 }
                 return true;
             });
 
-            // Remove old obstacles
             obstacles[index] = obstacles[index].filter(obstacle => {
-                if (obstacle.position.z > pos.z + 50) {
+                if (obstacle.position.z > pos.z + 30) {
                     scenes[index].remove(obstacle);
-                    obstacle.geometry.dispose();
-                    obstacle.material.dispose();
+                    if (obstacle.geometry) obstacle.geometry.dispose();
+                    if (obstacle.material) obstacle.material.dispose();
                     return false;
                 }
                 return true;
@@ -947,8 +1052,7 @@
         }
 
         function updateScore(index) {
-            const scoreEl = document.getElementById('score' + (index + 1));
-            scoreEl.textContent = scores[index];
+            document.getElementById('score' + (index + 1)).textContent = scores[index];
         }
 
         function updateOpponentScore() {
@@ -975,7 +1079,7 @@
             const overlay = document.getElementById('gameover' + (index + 1));
             const scoreEl = document.getElementById('final-score' + (index + 1));
 
-            scoreEl.textContent = 'Final Score: ' + finalScore;
+            scoreEl.textContent = 'SCORE: ' + finalScore;
             overlay.classList.add('active');
         }
 
@@ -983,9 +1087,11 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
                 keys.left = true;
+                e.preventDefault();
             }
             if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
                 keys.right = true;
+                e.preventDefault();
             }
         });
 
@@ -1005,7 +1111,6 @@
             if (e.key === 'Enter') joinRoom();
         });
 
-        // Handle window resize
         window.addEventListener('resize', () => {
             for (let i = 0; i < 2; i++) {
                 if (cameras[i] && renderers[i]) {
