@@ -255,11 +255,16 @@
         // ============ SEGMENT TYPES ============
         const SEGMENT_TYPES = {
             FLAT: 'flat',
+            GENTLE_SLOPE: 'gentleSlope',
             STEEP: 'steep',
             OFFSET_LEFT: 'offsetLeft',
             OFFSET_RIGHT: 'offsetRight',
             NARROW: 'narrow',
-            GAP: 'gap'
+            WIDE: 'wide',
+            GAP: 'gap',
+            ZIGZAG: 'zigzag',
+            STAIRS: 'stairs',
+            FUNNEL: 'funnel'
         };
 
         // ============ NETWORKING ============
@@ -400,7 +405,7 @@
             // Scene
             scenes[idx] = new THREE.Scene();
             scenes[idx].background = new THREE.Color(0x000000);
-            scenes[idx].fog = new THREE.FogExp2(0x000000, 0.012);
+            scenes[idx].fog = new THREE.FogExp2(0x000000, 0.008);
 
             // Camera
             cameras[idx] = new THREE.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.1, 500);
@@ -413,28 +418,91 @@
             container.appendChild(renderers[idx].domElement);
 
             // Minimal lighting
-            scenes[idx].add(new THREE.AmbientLight(0x222222));
-            const dirLight = new THREE.DirectionalLight(0x00ff00, 0.2);
+            scenes[idx].add(new THREE.AmbientLight(0x444444));
+            const dirLight = new THREE.DirectionalLight(0x00ff00, 0.3);
             dirLight.position.set(5, 10, 5);
             scenes[idx].add(dirLight);
 
-            // Ball
+            // Ball - Wireframe sphere style
             const ballColor = idx === 0 ? BLUE : RED;
-            const ballGeom = new THREE.SphereGeometry(BALL_RADIUS, 32, 32);
-            const ballMat = new THREE.MeshBasicMaterial({ color: ballColor });
+            const ballGeom = new THREE.IcosahedronGeometry(BALL_RADIUS, 1);
+            const ballMat = new THREE.MeshBasicMaterial({
+                color: ballColor,
+                wireframe: true,
+                wireframeLinewidth: 2
+            });
             balls[idx] = new THREE.Mesh(ballGeom, ballMat);
             balls[idx].position.copy(ballPos[idx]);
             scenes[idx].add(balls[idx]);
 
+            // Ball inner core (solid)
+            const coreGeom = new THREE.IcosahedronGeometry(BALL_RADIUS * 0.6, 1);
+            const coreMat = new THREE.MeshBasicMaterial({ color: ballColor, transparent: true, opacity: 0.4 });
+            const core = new THREE.Mesh(coreGeom, coreMat);
+            balls[idx].add(core);
+
             // Ball glow
-            const glowGeom = new THREE.SphereGeometry(BALL_RADIUS * 1.4, 32, 32);
-            const glowMat = new THREE.MeshBasicMaterial({ color: ballColor, transparent: true, opacity: 0.25 });
+            const glowGeom = new THREE.IcosahedronGeometry(BALL_RADIUS * 1.5, 1);
+            const glowMat = new THREE.MeshBasicMaterial({ color: ballColor, wireframe: true, transparent: true, opacity: 0.15 });
             ballGlows[idx] = new THREE.Mesh(glowGeom, glowMat);
             ballGlows[idx].position.copy(ballPos[idx]);
             scenes[idx].add(ballGlows[idx]);
 
+            // Background buildings/geometry
+            createBackgroundBuildings(idx);
+
             // Starfield
             createStarfield(idx);
+        }
+
+        function createBackgroundBuildings(idx) {
+            const scene = scenes[idx];
+            const buildingMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, wireframe: true });
+            const buildingFillMat = new THREE.MeshBasicMaterial({ color: 0x001100, transparent: true, opacity: 0.3 });
+
+            // Create rows of buildings on both sides
+            for (let side = -1; side <= 1; side += 2) {
+                for (let i = 0; i < 30; i++) {
+                    const height = 20 + Math.random() * 60;
+                    const width = 8 + Math.random() * 15;
+                    const depth = 8 + Math.random() * 15;
+                    const xPos = side * (25 + Math.random() * 40);
+                    const zPos = -i * 50 - Math.random() * 30;
+                    const yPos = -i * DROP_PER_SEGMENT * 1.5 - height / 2 - 30;
+
+                    // Wireframe building
+                    const buildGeom = new THREE.BoxGeometry(width, height, depth);
+                    const building = new THREE.Mesh(buildGeom, buildingMat);
+                    building.position.set(xPos, yPos, zPos);
+                    scene.add(building);
+
+                    // Fill
+                    const fillBuilding = new THREE.Mesh(buildGeom, buildingFillMat);
+                    fillBuilding.position.copy(building.position);
+                    scene.add(fillBuilding);
+                }
+            }
+
+            // Add some floating geometric shapes
+            for (let i = 0; i < 20; i++) {
+                const shapeType = Math.floor(Math.random() * 3);
+                let geom;
+                if (shapeType === 0) {
+                    geom = new THREE.TetrahedronGeometry(3 + Math.random() * 4);
+                } else if (shapeType === 1) {
+                    geom = new THREE.OctahedronGeometry(2 + Math.random() * 3);
+                } else {
+                    geom = new THREE.IcosahedronGeometry(2 + Math.random() * 3);
+                }
+                const shape = new THREE.Mesh(geom, buildingMat);
+                shape.position.set(
+                    (Math.random() - 0.5) * 100,
+                    -i * 8 - 10 - Math.random() * 20,
+                    -i * 40 - Math.random() * 30 - 50
+                );
+                shape.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+                scene.add(shape);
+            }
         }
 
         function createStarfield(idx) {
@@ -463,24 +531,51 @@
             let xOffset = 0;
             let slopeMultiplier = 1;
             let hasGap = false;
+            let isZigzag = false;
+            let isFunnel = false;
 
             // After first few segments, add variety
             if (segIdx > 2) {
-                const difficulty = Math.min(segIdx / 50, 1); // 0-1 over 50 segments
+                const difficulty = Math.min(segIdx / 40, 1); // 0-1 over 40 segments
                 const r = rng.next();
 
-                if (r < 0.15 * difficulty) {
+                if (r < 0.08) {
+                    // Gentle slope - slightly easier
+                    segType = SEGMENT_TYPES.GENTLE_SLOPE;
+                    slopeMultiplier = 0.7 + rng.next() * 0.3;
+                } else if (r < 0.18 * difficulty) {
+                    // Steep drop
                     segType = SEGMENT_TYPES.STEEP;
-                    slopeMultiplier = 1.5 + rng.next() * 0.5;
-                } else if (r < 0.3 * difficulty) {
+                    slopeMultiplier = 1.5 + rng.next() * 0.8;
+                } else if (r < 0.32 * difficulty) {
+                    // Offset segments
                     segType = rng.next() < 0.5 ? SEGMENT_TYPES.OFFSET_LEFT : SEGMENT_TYPES.OFFSET_RIGHT;
-                    xOffset = (segType === SEGMENT_TYPES.OFFSET_LEFT ? -1 : 1) * (2 + rng.next() * 2);
-                } else if (r < 0.4 * difficulty) {
+                    xOffset = (segType === SEGMENT_TYPES.OFFSET_LEFT ? -1 : 1) * (2 + rng.next() * 3);
+                } else if (r < 0.42 * difficulty) {
+                    // Narrow platform
                     segType = SEGMENT_TYPES.NARROW;
-                    trackW = TRACK_WIDTH * (0.5 + rng.next() * 0.2);
-                } else if (r < 0.5 * difficulty && segIdx > 10) {
+                    trackW = TRACK_WIDTH * (0.45 + rng.next() * 0.2);
+                } else if (r < 0.50 * difficulty) {
+                    // Wide multi-lane
+                    segType = SEGMENT_TYPES.WIDE;
+                    trackW = TRACK_WIDTH * (1.4 + rng.next() * 0.4);
+                } else if (r < 0.58 * difficulty && segIdx > 8) {
+                    // Gap segment
                     segType = SEGMENT_TYPES.GAP;
                     hasGap = true;
+                } else if (r < 0.66 * difficulty && segIdx > 12) {
+                    // Zigzag corridor
+                    segType = SEGMENT_TYPES.ZIGZAG;
+                    isZigzag = true;
+                    trackW = TRACK_WIDTH * 0.7;
+                } else if (r < 0.74 * difficulty && segIdx > 6) {
+                    // Funnel (wide to narrow)
+                    segType = SEGMENT_TYPES.FUNNEL;
+                    isFunnel = true;
+                } else if (r < 0.82 * difficulty && segIdx > 15) {
+                    // Stairs segment
+                    segType = SEGMENT_TYPES.STAIRS;
+                    slopeMultiplier = 0.5;
                 }
             }
 
@@ -506,22 +601,29 @@
                 width: trackW,
                 slope: slopeAngle,
                 meshes: [],
-                obstacleMeshes: []
+                obstacleMeshes: [],
+                isZigzag,
+                isFunnel
             };
 
-            // Create main platform
-            if (!hasGap) {
-                createPlatformMeshes(scene, segData, rng, segIdx);
-            } else {
-                // Gap segment - shorter platform with gap in middle
+            // Create main platform based on type
+            if (hasGap) {
                 createGapSegment(scene, segData, rng);
+            } else if (isZigzag) {
+                createZigzagSegment(scene, segData, rng);
+            } else if (isFunnel) {
+                createFunnelSegment(scene, segData, rng);
+            } else if (segType === SEGMENT_TYPES.STAIRS) {
+                createStairsSegment(scene, segData, rng);
+            } else {
+                createPlatformMeshes(scene, segData, rng, segIdx);
             }
 
             // Create connecting ramp to next segment
             createRamp(scene, segData);
 
-            // Add obstacles
-            if (segIdx > 1 && !hasGap) {
+            // Add obstacles (not on special segments)
+            if (segIdx > 1 && !hasGap && !isZigzag && segType !== SEGMENT_TYPES.STAIRS) {
                 createObstacles(scene, segData, rng, segIdx);
             }
 
@@ -529,47 +631,233 @@
             segmentIndex[playerIdx]++;
         }
 
+        // Create zigzag corridor segment
+        function createZigzagSegment(scene, seg, rng) {
+            const { startZ, startY, x, width, slope } = seg;
+            const length = SEGMENT_LENGTH - RAMP_LENGTH;
+            const numZigs = 3;
+            const zigLength = length / numZigs;
+            const zigOffset = width * 0.6;
+
+            const mat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
+            const wireMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, wireframe: true });
+            const edgeMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN });
+
+            let currentX = x;
+            let direction = rng.next() < 0.5 ? 1 : -1;
+
+            for (let i = 0; i < numZigs; i++) {
+                const segZ = startZ - i * zigLength - zigLength / 2;
+                const segY = startY - (DROP_PER_SEGMENT * (i + 0.5) / numZigs);
+
+                // Platform piece
+                const geom = new THREE.BoxGeometry(width, 0.4, zigLength + 1);
+                const platform = new THREE.Mesh(geom, mat);
+                platform.position.set(currentX, segY - 0.2, segZ);
+                platform.rotation.x = slope;
+                scene.add(platform);
+                seg.meshes.push(platform);
+
+                // Wireframe
+                const wire = new THREE.Mesh(geom, wireMat);
+                wire.position.copy(platform.position);
+                wire.rotation.copy(platform.rotation);
+                scene.add(wire);
+                seg.meshes.push(wire);
+
+                // Edges
+                const edgeGeom = new THREE.BoxGeometry(0.15, 0.5, zigLength + 1);
+                const leftEdge = new THREE.Mesh(edgeGeom, edgeMat);
+                leftEdge.position.set(currentX - width / 2 + 0.075, segY, segZ);
+                leftEdge.rotation.x = slope;
+                scene.add(leftEdge);
+                seg.meshes.push(leftEdge);
+
+                const rightEdge = new THREE.Mesh(edgeGeom, edgeMat);
+                rightEdge.position.set(currentX + width / 2 - 0.075, segY, segZ);
+                rightEdge.rotation.x = slope;
+                scene.add(rightEdge);
+                seg.meshes.push(rightEdge);
+
+                // Alternate direction
+                if (i < numZigs - 1) {
+                    currentX += direction * zigOffset;
+                    direction *= -1;
+                }
+            }
+
+            seg.endX = currentX;
+        }
+
+        // Create funnel segment (wide to narrow)
+        function createFunnelSegment(scene, seg, rng) {
+            const { startZ, startY, x, slope } = seg;
+            const length = SEGMENT_LENGTH - RAMP_LENGTH;
+            const startWidth = TRACK_WIDTH * 1.5;
+            const endWidth = TRACK_WIDTH * 0.6;
+
+            const mat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
+            const wireMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, wireframe: true });
+            const edgeMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN });
+
+            // Create tapered platform using multiple segments
+            const numSections = 5;
+            const sectionLength = length / numSections;
+
+            for (let i = 0; i < numSections; i++) {
+                const progress = i / numSections;
+                const nextProgress = (i + 1) / numSections;
+                const sectionWidth = startWidth - (startWidth - endWidth) * (progress + nextProgress) / 2;
+
+                const segZ = startZ - i * sectionLength - sectionLength / 2;
+                const segY = startY - DROP_PER_SEGMENT * (i + 0.5) / numSections;
+
+                const geom = new THREE.BoxGeometry(sectionWidth, 0.4, sectionLength + 0.5);
+                const platform = new THREE.Mesh(geom, mat);
+                platform.position.set(x, segY - 0.2, segZ);
+                platform.rotation.x = slope;
+                scene.add(platform);
+                seg.meshes.push(platform);
+
+                const wire = new THREE.Mesh(geom, wireMat);
+                wire.position.copy(platform.position);
+                wire.rotation.copy(platform.rotation);
+                scene.add(wire);
+                seg.meshes.push(wire);
+
+                // Edges
+                const edgeGeom = new THREE.BoxGeometry(0.15, 0.5, sectionLength + 0.5);
+                const leftEdge = new THREE.Mesh(edgeGeom, edgeMat);
+                leftEdge.position.set(x - sectionWidth / 2 + 0.075, segY, segZ);
+                leftEdge.rotation.x = slope;
+                scene.add(leftEdge);
+                seg.meshes.push(leftEdge);
+
+                const rightEdge = new THREE.Mesh(edgeGeom, edgeMat);
+                rightEdge.position.set(x + sectionWidth / 2 - 0.075, segY, segZ);
+                rightEdge.rotation.x = slope;
+                scene.add(rightEdge);
+                seg.meshes.push(rightEdge);
+            }
+
+            seg.width = endWidth; // Update width for collision detection at end
+        }
+
+        // Create stairs segment
+        function createStairsSegment(scene, seg, rng) {
+            const { startZ, startY, x, width, slope } = seg;
+            const length = SEGMENT_LENGTH - RAMP_LENGTH;
+            const numSteps = 4;
+            const stepLength = length / numSteps;
+            const stepDrop = DROP_PER_SEGMENT / numSteps;
+
+            const mat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
+            const wireMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, wireframe: true });
+            const edgeMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN });
+
+            for (let i = 0; i < numSteps; i++) {
+                const stepZ = startZ - i * stepLength - stepLength / 2;
+                const stepY = startY - i * stepDrop - 0.2;
+
+                // Step platform
+                const geom = new THREE.BoxGeometry(width, 0.6, stepLength);
+                const step = new THREE.Mesh(geom, mat);
+                step.position.set(x, stepY - 0.3, stepZ);
+                scene.add(step);
+                seg.meshes.push(step);
+
+                // Wireframe
+                const wire = new THREE.Mesh(geom, wireMat);
+                wire.position.copy(step.position);
+                scene.add(wire);
+                seg.meshes.push(wire);
+
+                // Edge lines
+                const edgeGeom = new THREE.BoxGeometry(0.15, 0.7, stepLength);
+                const leftEdge = new THREE.Mesh(edgeGeom, edgeMat);
+                leftEdge.position.set(x - width / 2 + 0.075, stepY - 0.2, stepZ);
+                scene.add(leftEdge);
+                seg.meshes.push(leftEdge);
+
+                const rightEdge = new THREE.Mesh(edgeGeom, edgeMat);
+                rightEdge.position.set(x + width / 2 - 0.075, stepY - 0.2, stepZ);
+                scene.add(rightEdge);
+                seg.meshes.push(rightEdge);
+
+                // Front edge of step (glowing line)
+                if (i > 0) {
+                    const frontGeom = new THREE.BoxGeometry(width, 0.15, 0.15);
+                    const frontEdge = new THREE.Mesh(frontGeom, edgeMat);
+                    frontEdge.position.set(x, stepY, stepZ + stepLength / 2);
+                    scene.add(frontEdge);
+                    seg.meshes.push(frontEdge);
+                }
+            }
+        }
+
         function createPlatformMeshes(scene, seg, rng, segIdx) {
             const { startZ, startY, endY, x, width, slope } = seg;
 
-            // Main platform surface
+            // Main platform surface - dark with subtle visibility
             const length = SEGMENT_LENGTH - RAMP_LENGTH;
-            const platformGeom = new THREE.BoxGeometry(width, 0.3, length);
-            const platformMat = new THREE.MeshBasicMaterial({ color: DARK_SURFACE });
+            const platformGeom = new THREE.BoxGeometry(width, 0.4, length);
+            const platformMat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
             const platform = new THREE.Mesh(platformGeom, platformMat);
 
             const midZ = startZ - length / 2;
             const midY = startY - (DROP_PER_SEGMENT * (length / SEGMENT_LENGTH)) / 2;
-            platform.position.set(x, midY - 0.15, midZ);
+            platform.position.set(x, midY - 0.2, midZ);
             platform.rotation.x = slope;
             scene.add(platform);
             seg.meshes.push(platform);
 
-            // Edge lines (neon green)
-            const edgeGeom = new THREE.BoxGeometry(0.12, 0.35, length);
+            // Wireframe overlay for platform
+            const wireframeMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, wireframe: true });
+            const wireframe = new THREE.Mesh(platformGeom, wireframeMat);
+            wireframe.position.copy(platform.position);
+            wireframe.rotation.copy(platform.rotation);
+            scene.add(wireframe);
+            seg.meshes.push(wireframe);
+
+            // Edge lines (bright neon green) - left side
+            const edgeGeom = new THREE.BoxGeometry(0.15, 0.5, length);
             const edgeMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN });
 
             const leftEdge = new THREE.Mesh(edgeGeom, edgeMat);
-            leftEdge.position.set(x - width / 2 + 0.06, midY, midZ);
+            leftEdge.position.set(x - width / 2 + 0.075, midY, midZ);
             leftEdge.rotation.x = slope;
             scene.add(leftEdge);
             seg.meshes.push(leftEdge);
 
+            // Right edge
             const rightEdge = new THREE.Mesh(edgeGeom, edgeMat);
-            rightEdge.position.set(x + width / 2 - 0.06, midY, midZ);
+            rightEdge.position.set(x + width / 2 - 0.075, midY, midZ);
             rightEdge.rotation.x = slope;
             scene.add(rightEdge);
             seg.meshes.push(rightEdge);
 
-            // Grid lines
-            const gridMat = new THREE.MeshBasicMaterial({ color: GRID_COLOR, transparent: true, opacity: 0.6 });
-            const gridCount = Math.floor(length / 4);
-            for (let i = 0; i < gridCount; i++) {
-                const gridGeom = new THREE.BoxGeometry(width - 0.3, 0.02, 0.08);
+            // Grid lines across platform (horizontal stripes)
+            const gridMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, transparent: true, opacity: 0.8 });
+            const gridCountZ = Math.floor(length / 3);
+            for (let i = 0; i < gridCountZ; i++) {
+                const gridGeom = new THREE.BoxGeometry(width - 0.2, 0.05, 0.1);
                 const grid = new THREE.Mesh(gridGeom, gridMat);
-                const gz = startZ - (i + 0.5) * (length / gridCount);
-                const gy = startY - DROP_PER_SEGMENT * ((i + 0.5) * (length / gridCount) / SEGMENT_LENGTH);
-                grid.position.set(x, gy + 0.01, gz);
+                const gz = startZ - (i + 0.5) * (length / gridCountZ);
+                const gy = startY - DROP_PER_SEGMENT * ((i + 0.5) * (length / gridCountZ) / SEGMENT_LENGTH);
+                grid.position.set(x, gy + 0.05, gz);
+                grid.rotation.x = slope;
+                scene.add(grid);
+                seg.meshes.push(grid);
+            }
+
+            // Longitudinal grid lines (running along the platform)
+            const gridCountX = Math.floor(width / 2);
+            const longGridMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, transparent: true, opacity: 0.5 });
+            for (let i = 1; i < gridCountX; i++) {
+                const gridGeom = new THREE.BoxGeometry(0.08, 0.04, length);
+                const grid = new THREE.Mesh(gridGeom, longGridMat);
+                const gx = x - width / 2 + (i * width / gridCountX);
+                grid.position.set(gx, midY + 0.03, midZ);
                 grid.rotation.x = slope;
                 scene.add(grid);
                 seg.meshes.push(grid);
@@ -584,13 +872,21 @@
             const gapLen = (SEGMENT_LENGTH - RAMP_LENGTH) * 0.3;
 
             // Platform before gap
-            const geom1 = new THREE.BoxGeometry(width, 0.3, halfLen);
-            const mat = new THREE.MeshBasicMaterial({ color: DARK_SURFACE });
+            const geom1 = new THREE.BoxGeometry(width, 0.4, halfLen);
+            const mat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
+            const wireMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, wireframe: true });
             const p1 = new THREE.Mesh(geom1, mat);
             p1.position.set(x, startY - 0.5, startZ - halfLen / 2);
             p1.rotation.x = SLOPE_ANGLE;
             scene.add(p1);
             seg.meshes.push(p1);
+
+            // Wireframe overlay
+            const p1Wire = new THREE.Mesh(geom1, wireMat);
+            p1Wire.position.copy(p1.position);
+            p1Wire.rotation.copy(p1.rotation);
+            scene.add(p1Wire);
+            seg.meshes.push(p1Wire);
 
             // Platform after gap
             const p2StartZ = startZ - halfLen - gapLen;
@@ -600,20 +896,27 @@
             scene.add(p2);
             seg.meshes.push(p2);
 
+            // Wireframe overlay for second platform
+            const p2Wire = new THREE.Mesh(geom1, wireMat);
+            p2Wire.position.copy(p2.position);
+            p2Wire.rotation.copy(p2.rotation);
+            scene.add(p2Wire);
+            seg.meshes.push(p2Wire);
+
             // Edge lines for both parts
-            const edgeGeom = new THREE.BoxGeometry(0.12, 0.35, halfLen);
+            const edgeGeom = new THREE.BoxGeometry(0.15, 0.5, halfLen);
             const edgeMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN });
 
             [startZ - halfLen / 2, p2StartZ - halfLen / 2].forEach((z, i) => {
                 const y = i === 0 ? startY - 0.35 : startY - DROP_PER_SEGMENT * 0.65 - 0.35;
                 const left = new THREE.Mesh(edgeGeom, edgeMat);
-                left.position.set(x - width / 2 + 0.06, y, z);
+                left.position.set(x - width / 2 + 0.075, y, z);
                 left.rotation.x = SLOPE_ANGLE;
                 scene.add(left);
                 seg.meshes.push(left);
 
                 const right = new THREE.Mesh(edgeGeom, edgeMat);
-                right.position.set(x + width / 2 - 0.06, y, z);
+                right.position.set(x + width / 2 - 0.075, y, z);
                 right.rotation.x = SLOPE_ANGLE;
                 scene.add(right);
                 seg.meshes.push(right);
@@ -626,26 +929,34 @@
             const rampY = endY + 0.3;
 
             // Ramp surface
-            const rampGeom = new THREE.BoxGeometry(width, 0.2, RAMP_LENGTH);
-            const rampMat = new THREE.MeshBasicMaterial({ color: DARK_SURFACE });
+            const rampGeom = new THREE.BoxGeometry(width, 0.3, RAMP_LENGTH);
+            const rampMat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
             const ramp = new THREE.Mesh(rampGeom, rampMat);
             ramp.position.set(x, rampY, rampZ);
             ramp.rotation.x = -0.2; // Slight upward angle for ramp
             scene.add(ramp);
             seg.meshes.push(ramp);
 
+            // Wireframe overlay
+            const wireMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN, wireframe: true });
+            const rampWire = new THREE.Mesh(rampGeom, wireMat);
+            rampWire.position.copy(ramp.position);
+            rampWire.rotation.copy(ramp.rotation);
+            scene.add(rampWire);
+            seg.meshes.push(rampWire);
+
             // Ramp edges
-            const edgeGeom = new THREE.BoxGeometry(0.12, 0.25, RAMP_LENGTH);
+            const edgeGeom = new THREE.BoxGeometry(0.15, 0.4, RAMP_LENGTH);
             const edgeMat = new THREE.MeshBasicMaterial({ color: NEON_GREEN });
 
             const leftEdge = new THREE.Mesh(edgeGeom, edgeMat);
-            leftEdge.position.set(x - width / 2 + 0.06, rampY + 0.1, rampZ);
+            leftEdge.position.set(x - width / 2 + 0.075, rampY + 0.1, rampZ);
             leftEdge.rotation.x = -0.2;
             scene.add(leftEdge);
             seg.meshes.push(leftEdge);
 
             const rightEdge = new THREE.Mesh(edgeGeom, edgeMat);
-            rightEdge.position.set(x + width / 2 - 0.06, rampY + 0.1, rampZ);
+            rightEdge.position.set(x + width / 2 - 0.075, rampY + 0.1, rampZ);
             rightEdge.rotation.x = -0.2;
             scene.add(rightEdge);
             seg.meshes.push(rightEdge);
@@ -659,6 +970,35 @@
 
             const obstacleType = rng.next();
             const platformLen = SEGMENT_LENGTH - RAMP_LENGTH;
+            const playerIdx = scene === scenes[0] ? 0 : 1;
+
+            // Helper to create a glowing red obstacle
+            function createRedObstacle(obsX, obsY, obsZ, sizeX, sizeY, sizeZ) {
+                // Solid dark red core
+                const geom = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
+                const mat = new THREE.MeshBasicMaterial({ color: 0x330000 });
+                const obs = new THREE.Mesh(geom, mat);
+                obs.position.set(obsX, obsY, obsZ);
+                scene.add(obs);
+                seg.obstacleMeshes.push(obs);
+
+                // Bright red wireframe
+                const wireMat = new THREE.MeshBasicMaterial({ color: RED, wireframe: true });
+                const wire = new THREE.Mesh(geom, wireMat);
+                wire.position.copy(obs.position);
+                scene.add(wire);
+                seg.meshes.push(wire);
+
+                // Outer glow
+                const glowGeom = new THREE.BoxGeometry(sizeX + 0.3, sizeY + 0.3, sizeZ + 0.3);
+                const glowMat = new THREE.MeshBasicMaterial({ color: RED, transparent: true, opacity: 0.2 });
+                const glow = new THREE.Mesh(glowGeom, glowMat);
+                glow.position.copy(obs.position);
+                scene.add(glow);
+                seg.meshes.push(glow);
+
+                obstacles[playerIdx].push({ mesh: obs, size: Math.max(sizeX, sizeY, sizeZ) });
+            }
 
             if (obstacleType < 0.5) {
                 // Single or double red blocks
@@ -668,22 +1008,7 @@
                     const obsX = x + rng.range(-width / 2 + size, width / 2 - size);
                     const obsZ = startZ - rng.range(5, platformLen - 5);
                     const obsY = startY - DROP_PER_SEGMENT * (-obsZ - startZ) / SEGMENT_LENGTH + size / 2 + 0.2;
-
-                    const geom = new THREE.BoxGeometry(size, size, size);
-                    const mat = new THREE.MeshBasicMaterial({ color: RED });
-                    const obs = new THREE.Mesh(geom, mat);
-                    obs.position.set(obsX, obsY, obsZ);
-                    scene.add(obs);
-                    seg.obstacleMeshes.push(obs);
-                    obstacles[scene === scenes[0] ? 0 : 1].push({ mesh: obs, size });
-
-                    // Glow
-                    const glowGeom = new THREE.BoxGeometry(size + 0.2, size + 0.2, size + 0.2);
-                    const glowMat = new THREE.MeshBasicMaterial({ color: RED, transparent: true, opacity: 0.15 });
-                    const glow = new THREE.Mesh(glowGeom, glowMat);
-                    glow.position.copy(obs.position);
-                    scene.add(glow);
-                    seg.meshes.push(glow);
+                    createRedObstacle(obsX, obsY, obsZ, size, size, size);
                 }
             } else if (obstacleType < 0.8) {
                 // Wall with gap
@@ -696,23 +1021,10 @@
                 const rightWidth = (x + width / 2) - (gapX + gapWidth / 2);
 
                 if (leftWidth > 0.5) {
-                    const geom = new THREE.BoxGeometry(leftWidth, 2, 1.5);
-                    const mat = new THREE.MeshBasicMaterial({ color: RED });
-                    const wall = new THREE.Mesh(geom, mat);
-                    wall.position.set(x - width / 2 + leftWidth / 2, wallY, wallZ);
-                    scene.add(wall);
-                    seg.obstacleMeshes.push(wall);
-                    obstacles[scene === scenes[0] ? 0 : 1].push({ mesh: wall, size: Math.max(leftWidth, 2) });
+                    createRedObstacle(x - width / 2 + leftWidth / 2, wallY, wallZ, leftWidth, 2, 1.5);
                 }
-
                 if (rightWidth > 0.5) {
-                    const geom = new THREE.BoxGeometry(rightWidth, 2, 1.5);
-                    const mat = new THREE.MeshBasicMaterial({ color: RED });
-                    const wall = new THREE.Mesh(geom, mat);
-                    wall.position.set(x + width / 2 - rightWidth / 2, wallY, wallZ);
-                    scene.add(wall);
-                    seg.obstacleMeshes.push(wall);
-                    obstacles[scene === scenes[0] ? 0 : 1].push({ mesh: wall, size: Math.max(rightWidth, 2) });
+                    createRedObstacle(x + width / 2 - rightWidth / 2, wallY, wallZ, rightWidth, 2, 1.5);
                 }
             } else {
                 // Slalom pattern
@@ -723,15 +1035,7 @@
                     const obsX = x + side * (width / 2 - size - 1);
                     const obsZ = startZ - 6 - i * (platformLen - 10) / numObs;
                     const obsY = startY - DROP_PER_SEGMENT * (-obsZ - startZ) / SEGMENT_LENGTH + size / 2 + 0.2;
-
-                    const geom = new THREE.BoxGeometry(size, size, size);
-                    const mat = new THREE.MeshBasicMaterial({ color: RED });
-                    const obs = new THREE.Mesh(geom, mat);
-                    obs.position.set(obsX, obsY, obsZ);
-                    scene.add(obs);
-                    seg.obstacleMeshes.push(obs);
-                    obstacles[scene === scenes[0] ? 0 : 1].push({ mesh: obs, size });
-
+                    createRedObstacle(obsX, obsY, obsZ, size, size, size);
                     side *= -1;
                 }
             }
@@ -786,35 +1090,81 @@
                 lateralVel[idx] = Math.max(-LATERAL_MAX_SPEED, Math.min(LATERAL_MAX_SPEED, lateralVel[idx]));
             }
 
+            // Store previous position for collision resolution
+            const prevX = pos.x;
+            const prevY = pos.y;
+            const prevZ = pos.z;
+
             // Apply movement
             pos.x += lateralVel[idx] * dt;
             pos.z -= forwardSpeed[idx] * dt;
 
-            // Gravity
+            // Apply gravity
             vel.y -= GRAVITY * dt;
             pos.y += vel.y * dt;
 
-            // Ground collision
-            const ground = getGroundInfo(idx, pos.x, pos.z);
-            if (ground) {
-                if (pos.y < ground.y + BALL_RADIUS) {
-                    pos.y = ground.y + BALL_RADIUS;
-                    vel.y = 0;
-                    isGrounded[idx] = true;
-                }
+            // Ground collision - check multiple points along movement path for fast speeds
+            const steps = Math.max(1, Math.ceil(forwardSpeed[idx] * dt / 2));
+            let foundGround = false;
+            let groundInfo = null;
 
-                // Check track boundaries
-                const halfW = ground.width / 2;
-                if (Math.abs(pos.x - ground.x) > halfW - BALL_RADIUS * 0.5) {
-                    // Falling off edge
+            for (let step = 0; step <= steps && !foundGround; step++) {
+                const t = step / steps;
+                const checkX = prevX + (pos.x - prevX) * t;
+                const checkZ = prevZ + (pos.z - prevZ) * t;
+                groundInfo = getGroundInfo(idx, checkX, checkZ);
+
+                if (groundInfo) {
+                    foundGround = true;
+                }
+            }
+
+            // Final position ground check
+            if (!groundInfo) {
+                groundInfo = getGroundInfo(idx, pos.x, pos.z);
+            }
+
+            if (groundInfo) {
+                const groundY = groundInfo.y + BALL_RADIUS;
+
+                // If ball is at or below ground level, place it on ground
+                if (pos.y <= groundY + 0.1) {
+                    pos.y = groundY;
+                    vel.y = Math.max(0, vel.y * -0.1); // Small bounce dampening
+                    isGrounded[idx] = true;
+
+                    // Add slope influence to forward velocity
+                    if (groundInfo.slope) {
+                        vel.y -= Math.sin(groundInfo.slope) * forwardSpeed[idx] * dt * 0.5;
+                    }
+                } else {
                     isGrounded[idx] = false;
                 }
+
+                // Check track edge boundaries
+                const halfW = groundInfo.width / 2;
+                const edgeDist = Math.abs(pos.x - groundInfo.x);
+
+                if (edgeDist > halfW - BALL_RADIUS * 0.3) {
+                    // Ball is at edge - either push back or let fall
+                    if (isGrounded[idx] && edgeDist < halfW + BALL_RADIUS) {
+                        // Push back from edge if still on platform
+                        const pushDir = pos.x > groundInfo.x ? -1 : 1;
+                        pos.x = groundInfo.x + pushDir * (halfW - BALL_RADIUS * 0.5);
+                        lateralVel[idx] *= 0.3; // Slow down lateral movement
+                    } else if (edgeDist > halfW) {
+                        // Falling off
+                        isGrounded[idx] = false;
+                    }
+                }
             } else {
+                // No ground beneath - falling
                 isGrounded[idx] = false;
             }
 
-            // Fall death
-            if (pos.y < FALL_DEATH_Y) {
+            // Fall death - check if fallen too far below track
+            const expectedY = -(-pos.z / SEGMENT_LENGTH) * DROP_PER_SEGMENT;
+            if (pos.y < expectedY - 30 || pos.y < FALL_DEATH_Y) {
                 triggerGameOver(idx);
                 return;
             }
@@ -824,7 +1174,7 @@
                 const dx = Math.abs(pos.x - obs.mesh.position.x);
                 const dy = Math.abs(pos.y - obs.mesh.position.y);
                 const dz = Math.abs(pos.z - obs.mesh.position.z);
-                const halfSize = obs.size / 2 + BALL_RADIUS * 0.8;
+                const halfSize = obs.size / 2 + BALL_RADIUS * 0.7;
 
                 if (dx < halfSize && dy < halfSize && dz < halfSize) {
                     triggerGameOver(idx);
@@ -838,14 +1188,14 @@
             balls[idx].rotation.z -= lateralVel[idx] * dt * 0.3;
             ballGlows[idx].position.copy(pos);
 
-            // Score
+            // Score based on distance traveled
             scores[idx] = Math.max(0, Math.floor(-pos.z));
             updateScore(idx);
             document.getElementById('speed' + (idx + 1)).textContent = 'SPEED: ' + Math.floor(forwardSpeed[idx]);
 
-            // Generate more segments
+            // Generate more segments ahead
             const currentSeg = Math.floor(-pos.z / SEGMENT_LENGTH);
-            while (segmentIndex[idx] < currentSeg + 8) {
+            while (segmentIndex[idx] < currentSeg + 10) {
                 generateSegment(idx);
             }
 
@@ -858,10 +1208,52 @@
                 const segStart = seg.startZ;
                 const segEnd = seg.startZ - SEGMENT_LENGTH;
 
-                if (z <= segStart && z >= segEnd) {
-                    const progress = (segStart - z) / SEGMENT_LENGTH;
-                    const y = seg.startY - progress * DROP_PER_SEGMENT;
-                    return { y, x: seg.x, width: seg.width };
+                if (z <= segStart + 1 && z >= segEnd - 1) {
+                    // Check if within track width (accounting for segment x offset)
+                    const halfWidth = seg.width / 2;
+                    if (Math.abs(x - seg.x) > halfWidth) {
+                        continue; // Not on this segment laterally
+                    }
+
+                    const progress = Math.max(0, Math.min(1, (segStart - z) / SEGMENT_LENGTH));
+
+                    // Calculate ground height based on segment type
+                    let groundY;
+                    const mainPlatformEnd = segStart - (SEGMENT_LENGTH - RAMP_LENGTH);
+
+                    if (z > mainPlatformEnd) {
+                        // On main platform (sloped down)
+                        const platformProgress = (segStart - z) / (SEGMENT_LENGTH - RAMP_LENGTH);
+                        groundY = seg.startY - platformProgress * (DROP_PER_SEGMENT * 0.85);
+
+                        // Account for slope angle - higher at edges due to rotation
+                        const distFromCenter = Math.abs(z - (segStart - (SEGMENT_LENGTH - RAMP_LENGTH) / 2));
+                        groundY -= Math.sin(seg.slope) * distFromCenter * 0.03;
+                    } else {
+                        // On ramp section (slight upward then connects to next)
+                        const rampProgress = (mainPlatformEnd - z) / RAMP_LENGTH;
+                        const baseY = seg.startY - DROP_PER_SEGMENT * 0.85;
+                        // Ramp goes slightly up then down to connect
+                        const rampCurve = Math.sin(rampProgress * Math.PI) * 0.3;
+                        groundY = baseY - rampProgress * (DROP_PER_SEGMENT * 0.15) + rampCurve;
+                    }
+
+                    // Handle gap segments (no ground in the gap)
+                    if (seg.type === SEGMENT_TYPES.GAP) {
+                        const gapStart = segStart - (SEGMENT_LENGTH - RAMP_LENGTH) * 0.35;
+                        const gapEnd = gapStart - (SEGMENT_LENGTH - RAMP_LENGTH) * 0.3;
+                        if (z < gapStart && z > gapEnd) {
+                            return null; // In the gap
+                        }
+                    }
+
+                    return {
+                        y: groundY,
+                        x: seg.x,
+                        width: seg.width,
+                        slope: seg.slope,
+                        type: seg.type
+                    };
                 }
             }
             return null;
