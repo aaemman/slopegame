@@ -7,6 +7,13 @@
     "img": "slope"
   },
   {
+    "slug": "slope-multiplayer",
+    "title": "Slope Multiplayer",
+    "cat": "Skill, Multiplayer",
+    "domain": 1,
+    "img": "slope-multiplayer"
+  },
+  {
     "slug": "tunnel-rush",
     "title": "Tunnel Rush",
     "cat": "Skill",
