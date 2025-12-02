@@ -234,8 +234,8 @@
         let balls = [null, null];
         let ballGlows = [null, null];
 
-        // Physics state
-        let ballPos = [new THREE.Vector3(0, 2, 0), new THREE.Vector3(0, 2, 0)];
+        // Physics state - ball starts on first platform
+        let ballPos = [new THREE.Vector3(0, BALL_RADIUS + 0.5, 0), new THREE.Vector3(0, BALL_RADIUS + 0.5, 0)];
         let ballVel = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];
         let lateralVel = [0, 0];
         let forwardSpeed = [BASE_FORWARD_SPEED, BASE_FORWARD_SPEED];
@@ -536,47 +536,48 @@
 
             // After first few segments, add variety
             if (segIdx > 2) {
-                const difficulty = Math.min(segIdx / 40, 1); // 0-1 over 40 segments
                 const r = rng.next();
 
-                if (r < 0.08) {
-                    // Gentle slope - slightly easier
+                // Variety appears from the start - each type has a fixed probability range
+                if (r < 0.10) {
+                    // Gentle slope
                     segType = SEGMENT_TYPES.GENTLE_SLOPE;
                     slopeMultiplier = 0.7 + rng.next() * 0.3;
-                } else if (r < 0.18 * difficulty) {
+                } else if (r < 0.20) {
                     // Steep drop
                     segType = SEGMENT_TYPES.STEEP;
                     slopeMultiplier = 1.5 + rng.next() * 0.8;
-                } else if (r < 0.32 * difficulty) {
-                    // Offset segments
+                } else if (r < 0.35) {
+                    // Offset segments - common
                     segType = rng.next() < 0.5 ? SEGMENT_TYPES.OFFSET_LEFT : SEGMENT_TYPES.OFFSET_RIGHT;
                     xOffset = (segType === SEGMENT_TYPES.OFFSET_LEFT ? -1 : 1) * (2 + rng.next() * 3);
-                } else if (r < 0.42 * difficulty) {
+                } else if (r < 0.45) {
                     // Narrow platform
                     segType = SEGMENT_TYPES.NARROW;
-                    trackW = TRACK_WIDTH * (0.45 + rng.next() * 0.2);
-                } else if (r < 0.50 * difficulty) {
+                    trackW = TRACK_WIDTH * (0.5 + rng.next() * 0.2);
+                } else if (r < 0.52) {
                     // Wide multi-lane
                     segType = SEGMENT_TYPES.WIDE;
                     trackW = TRACK_WIDTH * (1.4 + rng.next() * 0.4);
-                } else if (r < 0.58 * difficulty && segIdx > 8) {
+                } else if (r < 0.60 && segIdx > 5) {
                     // Gap segment
                     segType = SEGMENT_TYPES.GAP;
                     hasGap = true;
-                } else if (r < 0.66 * difficulty && segIdx > 12) {
+                } else if (r < 0.68 && segIdx > 6) {
                     // Zigzag corridor
                     segType = SEGMENT_TYPES.ZIGZAG;
                     isZigzag = true;
                     trackW = TRACK_WIDTH * 0.7;
-                } else if (r < 0.74 * difficulty && segIdx > 6) {
+                } else if (r < 0.76 && segIdx > 4) {
                     // Funnel (wide to narrow)
                     segType = SEGMENT_TYPES.FUNNEL;
                     isFunnel = true;
-                } else if (r < 0.82 * difficulty && segIdx > 15) {
+                } else if (r < 0.84 && segIdx > 8) {
                     // Stairs segment
                     segType = SEGMENT_TYPES.STAIRS;
                     slopeMultiplier = 0.5;
                 }
+                // else: FLAT (remaining ~16% or when segment index requirement not met)
             }
 
             // Calculate segment position
@@ -1125,35 +1126,34 @@
             }
 
             if (groundInfo) {
-                const groundY = groundInfo.y + BALL_RADIUS;
+                const groundSurface = groundInfo.y + BALL_RADIUS;
 
-                // If ball is at or below ground level, place it on ground
-                if (pos.y <= groundY + 0.1) {
-                    pos.y = groundY;
-                    vel.y = Math.max(0, vel.y * -0.1); // Small bounce dampening
+                // Collision detection - if ball is at or below ground, snap to surface
+                if (pos.y <= groundSurface) {
+                    pos.y = groundSurface;
+                    vel.y = 0; // Stop downward velocity
                     isGrounded[idx] = true;
-
-                    // Add slope influence to forward velocity
-                    if (groundInfo.slope) {
-                        vel.y -= Math.sin(groundInfo.slope) * forwardSpeed[idx] * dt * 0.5;
-                    }
+                } else if (pos.y < groundSurface + 0.5) {
+                    // Close to ground - apply gentle correction
+                    isGrounded[idx] = true;
                 } else {
                     isGrounded[idx] = false;
                 }
 
                 // Check track edge boundaries
                 const halfW = groundInfo.width / 2;
-                const edgeDist = Math.abs(pos.x - groundInfo.x);
+                const distFromCenter = pos.x - groundInfo.x;
+                const edgeDist = Math.abs(distFromCenter);
 
-                if (edgeDist > halfW - BALL_RADIUS * 0.3) {
-                    // Ball is at edge - either push back or let fall
-                    if (isGrounded[idx] && edgeDist < halfW + BALL_RADIUS) {
-                        // Push back from edge if still on platform
-                        const pushDir = pos.x > groundInfo.x ? -1 : 1;
-                        pos.x = groundInfo.x + pushDir * (halfW - BALL_RADIUS * 0.5);
-                        lateralVel[idx] *= 0.3; // Slow down lateral movement
-                    } else if (edgeDist > halfW) {
-                        // Falling off
+                if (edgeDist > halfW - BALL_RADIUS) {
+                    if (isGrounded[idx]) {
+                        // Push back from edge
+                        const pushDir = distFromCenter > 0 ? -1 : 1;
+                        pos.x = groundInfo.x + pushDir * -(halfW - BALL_RADIUS * 0.8);
+                        lateralVel[idx] *= 0.5;
+                    }
+                    if (edgeDist > halfW + BALL_RADIUS * 0.5) {
+                        // Definitely falling off
                         isGrounded[idx] = false;
                     }
                 }
@@ -1208,43 +1208,51 @@
                 const segStart = seg.startZ;
                 const segEnd = seg.startZ - SEGMENT_LENGTH;
 
-                if (z <= segStart + 1 && z >= segEnd - 1) {
+                if (z <= segStart + 2 && z >= segEnd - 2) {
                     // Check if within track width (accounting for segment x offset)
                     const halfWidth = seg.width / 2;
                     if (Math.abs(x - seg.x) > halfWidth) {
                         continue; // Not on this segment laterally
                     }
 
-                    const progress = Math.max(0, Math.min(1, (segStart - z) / SEGMENT_LENGTH));
-
-                    // Calculate ground height based on segment type
+                    // Calculate ground height based on z position within segment
                     let groundY;
-                    const mainPlatformEnd = segStart - (SEGMENT_LENGTH - RAMP_LENGTH);
+                    const mainPlatformLength = SEGMENT_LENGTH - RAMP_LENGTH;
+                    const mainPlatformEnd = segStart - mainPlatformLength;
 
-                    if (z > mainPlatformEnd) {
-                        // On main platform (sloped down)
-                        const platformProgress = (segStart - z) / (SEGMENT_LENGTH - RAMP_LENGTH);
-                        groundY = seg.startY - platformProgress * (DROP_PER_SEGMENT * 0.85);
-
-                        // Account for slope angle - higher at edges due to rotation
-                        const distFromCenter = Math.abs(z - (segStart - (SEGMENT_LENGTH - RAMP_LENGTH) / 2));
-                        groundY -= Math.sin(seg.slope) * distFromCenter * 0.03;
+                    if (z >= mainPlatformEnd) {
+                        // On main platform - simple linear drop
+                        const platformProgress = (segStart - z) / mainPlatformLength;
+                        groundY = seg.startY - platformProgress * DROP_PER_SEGMENT * 0.9;
                     } else {
-                        // On ramp section (slight upward then connects to next)
+                        // On ramp section - connects to next segment
                         const rampProgress = (mainPlatformEnd - z) / RAMP_LENGTH;
-                        const baseY = seg.startY - DROP_PER_SEGMENT * 0.85;
-                        // Ramp goes slightly up then down to connect
-                        const rampCurve = Math.sin(rampProgress * Math.PI) * 0.3;
-                        groundY = baseY - rampProgress * (DROP_PER_SEGMENT * 0.15) + rampCurve;
+                        const rampStartY = seg.startY - DROP_PER_SEGMENT * 0.9;
+                        groundY = rampStartY - rampProgress * DROP_PER_SEGMENT * 0.1;
                     }
 
                     // Handle gap segments (no ground in the gap)
                     if (seg.type === SEGMENT_TYPES.GAP) {
-                        const gapStart = segStart - (SEGMENT_LENGTH - RAMP_LENGTH) * 0.35;
-                        const gapEnd = gapStart - (SEGMENT_LENGTH - RAMP_LENGTH) * 0.3;
+                        const gapStart = segStart - mainPlatformLength * 0.35;
+                        const gapEnd = gapStart - mainPlatformLength * 0.3;
                         if (z < gapStart && z > gapEnd) {
                             return null; // In the gap
                         }
+                    }
+
+                    // Handle zigzag segments - track center position changes
+                    if (seg.isZigzag) {
+                        const zigProgress = (segStart - z) / mainPlatformLength;
+                        const zigSection = Math.floor(zigProgress * 3);
+                        // Approximate zigzag center offset
+                        const zigOffset = seg.width * 0.6 * (zigSection % 2 === 0 ? 0 : (zigSection === 1 ? 1 : -1));
+                        return {
+                            y: groundY,
+                            x: seg.x + zigOffset,
+                            width: seg.width,
+                            slope: seg.slope,
+                            type: seg.type
+                        };
                     }
 
                     return {
